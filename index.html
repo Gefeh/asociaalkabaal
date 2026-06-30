@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Indie Music Vault</title>
-
-    <!-- 1. THE CSS STYLES MUST GO INSIDE THIS STYLE TAG -->
     <style>
         :root {
             --bg-color: #0b0b0b;
@@ -32,7 +30,6 @@
             min-height: 100vh;
         }
 
-        /* Screen States */
         .screen {
             display: flex;
             flex-direction: column;
@@ -41,8 +38,14 @@
             width: 100%;
             min-height: 100vh;
             padding: 20px;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.6s ease-in-out; /* Smooth transition speed */
+            opacity: 1;
         }
+
+            .screen.fade-out {
+                opacity: 0;
+                pointer-events: none; /* Prevents clicks while fading out */
+            }
 
         .hidden {
             display: none !important;
@@ -53,18 +56,18 @@
             text-align: center;
         }
 
-        #game-screen h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--indie-red);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+            #game-screen h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                color: var(--indie-red);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
 
-        #game-screen p {
-            margin-bottom: 20px;
-            color: #aaa;
-        }
+            #game-screen p {
+                margin-bottom: 20px;
+                color: #aaa;
+            }
 
         #canvas-container {
             position: relative;
@@ -73,6 +76,57 @@
             background: #111;
             box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
             overflow: hidden;
+        }
+
+        /* --- SCREEN SHAKE EFFECT --- */
+        @keyframes shake {
+            0% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-2px, -3px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-4px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(0px, 3px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(2px, -2px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-2px, 3px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-4px, 2px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 2px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-2px, -2px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(3px, 3px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(2px, -3px) rotate(-1deg);
+            }
+        }
+
+        .shake {
+            animation: shake 0.2s linear;
         }
 
         canvas {
@@ -99,10 +153,10 @@
             text-transform: uppercase;
         }
 
-        .btn:hover {
-            background-color: var(--text-color);
-            color: var(--bg-color);
-        }
+            .btn:hover {
+                background-color: var(--text-color);
+                color: var(--bg-color);
+            }
 
         .btn-skip {
             border-color: #555;
@@ -110,11 +164,11 @@
             font-size: 0.85rem;
         }
 
-        .btn-skip:hover {
-            border-color: var(--text-color);
-            color: var(--text-color);
-            background: transparent;
-        }
+            .btn-skip:hover {
+                border-color: var(--text-color);
+                color: var(--text-color);
+                background: transparent;
+            }
 
         /* --- MUSIC SITE STYLES --- */
         #music-screen {
@@ -128,11 +182,11 @@
             margin-bottom: 40px;
         }
 
-        header h2 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
+            header h2 {
+                font-size: 3rem;
+                margin-bottom: 10px;
+                letter-spacing: 1px;
+            }
 
         .track-list {
             width: 100%;
@@ -192,15 +246,16 @@
             text-align: center;
         }
 
-        .download-btn:hover {
-            background-color: #ff5588;
-        }
+            .download-btn:hover {
+                background-color: #ff5588;
+            }
 
         @media (max-width: 600px) {
             .track-card {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .audio-player {
                 min-width: 100%;
             }
@@ -209,22 +264,23 @@
 </head>
 <body>
 
-    <!-- 2. THE HTML CONTENT (Sits between the head and the script) -->
+    <!-- SECTION 1: LANDING GAME -->
     <section id="game-screen" class="screen">
         <h1>Kill Spotify</h1>
-        <p>Click/Tap the falling Spotify logos to unlock the Music Vault!</p>
-        
+        <p>Destroy the bouncing Spotify logo 3 times to unlock the Music Vault!</p>
+
         <div id="canvas-container">
-            <canvas id="gameCanvas" width="400" height="450"></canvas>
+            <canvas id="gameCanvas" width="360" height="450"></canvas>
         </div>
 
         <div class="score-board">
-            Score: <span id="score">0</span> / 10
+            Hits: <span id="score">0</span> / 3
         </div>
 
         <button class="btn btn-skip" id="skip-btn">Skip Game & Stream Music</button>
     </section>
 
+    <!-- SECTION 2: MUSIC DOWNLOAD & STREAMING -->
     <section id="music-screen" class="screen hidden">
         <header>
             <h2>The Vault</h2>
@@ -269,7 +325,6 @@
         <button class="btn" style="margin-top: 40px;" onclick="restartGame()">Replay Game</button>
     </section>
 
-    <!-- 3. THE JAVASCRIPT CODE MUST GO INSIDE THIS SCRIPT TAG -->
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -277,13 +332,29 @@
         const gameScreen = document.getElementById('game-screen');
         const musicScreen = document.getElementById('music-screen');
         const skipBtn = document.getElementById('skip-btn');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        // Load the official transparent Spotify logo
+        const spotifyImg = new Image();
+        spotifyImg.src = 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg';
 
         let score = 0;
-        const targetScore = 10;
-        let targets = [];
-        let spawnInterval;
+        const targetScore = 3;
         let animationFrameId;
         let isGameOver = false;
+
+        // Freeze-frame / juice mechanics
+        let isFrozen = false;
+        let isFlashing = false;
+
+        // DVD Bouncing Target Object
+        const target = {
+            x: 180,
+            y: 225,
+            radius: 35,
+            vx: 3,
+            vy: 2.5
+        };
 
         function playPopSound() {
             try {
@@ -291,82 +362,91 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                // Higher pitch for hit confirmation
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
+                osc.stop(audioCtx.currentTime + 0.15);
             } catch (e) {
-                // Ignore audio block
+                // Ignore audio restriction context errors
             }
         }
 
-        class SpotifyTarget {
-            constructor() {
-                this.radius = Math.random() * 15 + 20;
-                this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
-                this.y = -this.radius;
-                this.speed = Math.random() * 2 + 1.5;
-            }
+        function initTarget() {
+            target.x = canvas.width / 2;
+            target.y = canvas.height / 2;
+            target.radius = 35;
 
-            update() {
-                this.y += this.speed;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#1DB954';
-                ctx.fill();
-                ctx.closePath();
-
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = 'round';
-
-                for (let i = 0; i < 3; i++) {
-                    ctx.beginPath();
-                    const offset = i * 4;
-                    ctx.arc(
-                        this.x, 
-                        this.y + (this.radius * 0.1) + offset, 
-                        this.radius * (0.45 + i * 0.15), 
-                        Math.PI * 1.25, 
-                        Math.PI * 1.75
-                    );
-                    ctx.stroke();
-                    ctx.closePath();
-                }
-            }
-        }
-
-        function spawnTarget() {
-            if (isGameOver) return;
-            targets.push(new SpotifyTarget());
-            clearInterval(spawnInterval);
-            spawnInterval = setInterval(spawnTarget, Math.random() * 800 + 600);
+            // Randomize starting direction
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2.5; // Starting speed
+            target.vx = Math.cos(angle) * speed;
+            target.vy = Math.sin(angle) * speed;
         }
 
         function updateGame() {
+            // Only move target if not frozen in hit stop
+            if (!isFrozen) {
+                target.x += target.vx;
+                target.y += target.vy;
+
+                // DVD Bounce Logic (Left/Right)
+                if (target.x - target.radius < 0) {
+                    target.x = target.radius;
+                    target.vx = -target.vx;
+                } else if (target.x + target.radius > canvas.width) {
+                    target.x = canvas.width - target.radius;
+                    target.vx = -target.vx;
+                }
+
+                // DVD Bounce Logic (Top/Bottom)
+                if (target.y - target.radius < 0) {
+                    target.y = target.radius;
+                    target.vy = -target.vy;
+                } else if (target.y + target.radius > canvas.height) {
+                    target.y = canvas.height - target.radius;
+                    target.vy = -target.vy;
+                }
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            targets = targets.filter(t => t.y - t.radius < canvas.height);
-
-            targets.forEach(t => {
-                t.update();
-                t.draw();
-            });
+            // Draw the target
+            if (isFlashing) {
+                // Draw a solid white circle for a bright flash effect on hit
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.closePath();
+            } else if (spotifyImg.complete) {
+                ctx.drawImage(
+                    spotifyImg,
+                    target.x - target.radius,
+                    target.y - target.radius,
+                    target.radius * 2,
+                    target.radius * 2
+                );
+            } else {
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#1DB954';
+                ctx.fill();
+                ctx.closePath();
+            }
 
             if (!isGameOver) {
                 animationFrameId = requestAnimationFrame(updateGame);
             }
         }
 
+        // Click / Touch Listeners
         canvas.addEventListener('mousedown', handleHit);
-        canvas.addEventListener('touchstart', function(e) {
+        canvas.addEventListener('touchstart', function (e) {
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
             const touch = e.touches[0];
@@ -383,22 +463,36 @@
         }
 
         function processHit(clickX, clickY) {
-            if (isGameOver) return;
+            if (isGameOver || isFrozen) return;
 
-            for (let i = targets.length - 1; i >= 0; i--) {
-                const t = targets[i];
-                const dist = Math.hypot(clickX - t.x, clickY - t.y);
-                
-                if (dist < t.radius) {
-                    playPopSound();
-                    targets.splice(i, 1);
-                    score++;
-                    scoreEl.textContent = score;
+            const dist = Math.hypot(clickX - target.x, clickY - target.y);
 
-                    if (score >= targetScore) {
-                        endGame(true);
-                    }
-                    break;
+            if (dist < target.radius) {
+                playPopSound();
+                score++;
+                scoreEl.textContent = score;
+
+                if (score >= targetScore) {
+                    endGame(true);
+                } else {
+                    isFrozen = true;
+                    isFlashing = true;
+
+                    canvasContainer.classList.add('shake');
+
+                    setTimeout(() => {
+                        isFrozen = false;
+                        isFlashing = false;
+                        canvasContainer.classList.remove('shake');
+                    }, 200);
+
+                    const currentSpeed = Math.hypot(target.vx, target.vy);
+                    const newSpeed = currentSpeed * 1.3;
+
+                    const randomAngle = Math.random() * Math.PI * 2;
+
+                    target.vx = Math.cos(randomAngle) * newSpeed;
+                    target.vy = Math.sin(randomAngle) * newSpeed;
                 }
             }
         }
@@ -406,48 +500,89 @@
         function endGame(won) {
             isGameOver = true;
             cancelAnimationFrame(animationFrameId);
-            clearInterval(spawnInterval);
 
             if (won) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 24px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText("SPOTIFY DEFEATED!", canvas.width / 2, canvas.height / 2 - 20);
-                ctx.font = '16px sans-serif';
-                ctx.fillText("Entering the Vault...", canvas.width / 2, canvas.height / 2 + 20);
+                isFrozen = true;
+                isFlashing = true;
+                canvasContainer.classList.add('shake');
 
                 setTimeout(() => {
-                    transitionToMusic();
-                }, 1500);
+                    canvasContainer.classList.remove('shake');
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = 'bold 24px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("SPOTIFY DEFEATED!", canvas.width / 2, canvas.height / 2 - 20);
+                    ctx.font = '16px sans-serif';
+                    ctx.fillText("Entering the Vault...", canvas.width / 2, canvas.height / 2 + 20);
+
+                    setTimeout(() => {
+                        transitionToMusic();
+                    }, 1500);
+                }, 300);
             }
         }
 
         function transitionToMusic() {
-            gameScreen.classList.add('hidden');
-            musicScreen.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // 1. Fade out the game screen smoothly
+            gameScreen.classList.add('fade-out');
+
+            // 2. Wait for the fade-out animation to finish (600ms)
+            setTimeout(() => {
+                gameScreen.classList.add('hidden');
+
+                // Prepare the music screen: make it visible but completely transparent
+                musicScreen.classList.add('fade-out');
+                musicScreen.classList.remove('hidden');
+
+                // Force a browser reflow so the browser registers the transparent state
+                void musicScreen.offsetWidth;
+
+                // Scroll to the top of the page instantly while it is hidden
+                window.scrollTo(0, 0);
+
+                // 3. Smoothly fade the music screen in
+                musicScreen.classList.remove('fade-out');
+            }, 600); // Matches the 0.6s transition in CSS
         }
 
         function restartGame() {
-            score = 0;
-            scoreEl.textContent = score;
-            isGameOver = false;
-            targets = [];
-            musicScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            initGame();
+            // 1. Fade out the music screen smoothly
+            musicScreen.classList.add('fade-out');
+
+            // 2. Wait 600ms, reset the game state, and swap the screens
+            setTimeout(() => {
+                score = 0;
+                scoreEl.textContent = score;
+                isGameOver = false;
+                isFrozen = false;
+                isFlashing = false;
+
+                musicScreen.classList.add('hidden');
+
+                // Prepare the game screen to be visible but transparent
+                gameScreen.classList.add('fade-out');
+                gameScreen.classList.remove('hidden');
+
+                // Force browser reflow
+                void gameScreen.offsetWidth;
+
+                // 3. Smoothly fade the game screen back in
+                gameScreen.classList.remove('fade-out');
+
+                initGame();
+            }, 600);
         }
 
         function initGame() {
-            clearInterval(spawnInterval);
-            spawnInterval = setInterval(spawnTarget, 1000);
+            initTarget();
             updateGame();
         }
 
         skipBtn.addEventListener('click', transitionToMusic);
 
+        // Start Game
         initGame();
     </script>
 </body>
