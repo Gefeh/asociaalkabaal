@@ -76,7 +76,16 @@
             background: #111;
             box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
             overflow: hidden;
+            /* Smoothly fades the border out on win */
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
+
+            /* Dynamically applied class to hide the box on win */
+            #canvas-container.borderless {
+                border-color: transparent !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
 
         /* --- SCREEN SHAKE EFFECT --- */
         @keyframes shake {
@@ -503,24 +512,43 @@
 
             if (won) {
                 isFrozen = true;
-                isFlashing = true;
+
+                // 1. Instantly turn the entire webpage pitch black
+                document.body.style.backgroundColor = '#000000';
+
+                // 2. Trigger the screen shake and remove the box border/glow
                 canvasContainer.classList.add('shake');
+                canvasContainer.classList.add('borderless'); // Makes the box disappear
 
-                setTimeout(() => {
-                    canvasContainer.classList.remove('shake');
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                let flashCount = 0;
+
+                // 3. Create a rapid flash loop (runs every 100 milliseconds)
+                const flashInterval = setInterval(() => {
+                    // Draw a black canvas background to blend seamlessly with the black page
+                    ctx.fillStyle = '#000000';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.font = 'bold 24px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText("SPOTIFY DEFEATED!", canvas.width / 2, canvas.height / 2 - 20);
-                    ctx.font = '16px sans-serif';
-                    ctx.fillText("Entering the Vault...", canvas.width / 2, canvas.height / 2 + 20);
 
-                    setTimeout(() => {
-                        transitionToMusic();
-                    }, 1500);
-                }, 300);
+                    // Alternate the text color between bright red and white
+                    const isRed = flashCount % 2 === 0;
+                    ctx.fillStyle = isRed ? '#ff3366' : '#ffffff';
+
+                    // Draw massive two-line text to fit the viewport perfectly
+                    ctx.font = '900 56px "Arial Black", Impact, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    ctx.fillText("SPOTIFY", canvas.width / 2, canvas.height / 2 - 35);
+                    ctx.fillText("KILLED", canvas.width / 2, canvas.height / 2 + 35);
+
+                    flashCount++;
+                }, 100);
+
+                // 4. Let the flash run for 1.2 seconds, then clean up and transition smoothly
+                setTimeout(() => {
+                    clearInterval(flashInterval);
+                    canvasContainer.classList.remove('shake');
+                    transitionToMusic();
+                }, 1200);
             }
         }
 
@@ -553,6 +581,12 @@
 
             // 2. Wait 600ms, reset the game state, and swap the screens
             setTimeout(() => {
+                // Reset the webpage background color back to default CSS styling
+                document.body.style.backgroundColor = '';
+
+                // Bring the red box border and glow back
+                canvasContainer.classList.remove('borderless');
+
                 score = 0;
                 scoreEl.textContent = score;
                 isGameOver = false;
