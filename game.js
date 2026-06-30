@@ -23,6 +23,7 @@ let isFlashing = false;
 let isTargetActive = true;
 let particles = [];
 let skipTimeout;
+let lastTime = 0;
 
 const target = {
     x: 180,
@@ -48,11 +49,11 @@ class Particle {
         this.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= this.decay;
-    }
+    update(dt) { 
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.alpha -= this.decay * dt;
+            }
 
     draw() {
         ctx.save();
@@ -85,15 +86,25 @@ function initTarget() {
     target.radius = 35;
 
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2.5;
+    const speed = 7.5;
     target.vx = Math.cos(angle) * speed;
     target.vy = Math.sin(angle) * speed;
 }
 
-function updateGame() {
+function updateGame(timestamp) {
+    if (!timestamp) timestamp = performance.now();
+    
+    if (!lastTime) lastTime = timestamp;
+    let dt = (timestamp - lastTime) / 16.667;
+
+    if (isNaN(dt) || dt > 4) {
+        dt = 1;
+    }
+    lastTime = timestamp;
+
     if (!isFrozen && isTargetActive) {
-        target.x += target.vx;
-        target.y += target.vy;
+        target.x += target.vx * dt;
+        target.y += target.vy * dt;
 
         if (target.x - target.radius < 0) {
             target.x = target.radius;
@@ -117,18 +128,17 @@ function updateGame() {
     if (isTargetActive) {
         if (isFlashing) {
             const isRed = Math.floor(Date.now() / 50) % 2 === 0;
-
-                    ctx.beginPath();
-                    ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = isRed ? '#ff3366' : '#FFFFFF';
-                    ctx.fill();
-                    ctx.closePath();
+            ctx.beginPath();
+            ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+            ctx.fillStyle = isRed ? '#ff3366' : '#FFFFFF';
+            ctx.fill();
+            ctx.closePath();
         } else if (spotifyImg.complete) {
             ctx.drawImage(
-                spotifyImg,
-                target.x - target.radius,
-                target.y - target.radius,
-                target.radius * 2,
+                spotifyImg, 
+                target.x - target.radius, 
+                target.y - target.radius, 
+                target.radius * 2, 
                 target.radius * 2
             );
         } else {
@@ -142,7 +152,7 @@ function updateGame() {
 
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.update();
+        p.update(dt);
         p.draw();
         if (p.alpha <= 0) {
             particles.splice(i, 1);
@@ -211,7 +221,7 @@ function processHit(clickX, clickY) {
             }, 200);
 
             const currentSpeed = Math.hypot(target.vx, target.vy);
-            const newSpeed = currentSpeed * 1.3;
+            const newSpeed = currentSpeed * 1.6;
 
             const randomAngle = Math.random() * Math.PI * 2;
             target.vx = Math.cos(randomAngle) * newSpeed;
@@ -295,6 +305,7 @@ function switchTab(targetTab) {
             document.body.style.backgroundColor = '';
             canvasContainer.classList.remove('borderless');
 
+            lastTime = 0;
             score = 0;
             isGameOver = false;
             isFrozen = false;
@@ -340,33 +351,17 @@ function switchTab(targetTab) {
 }
 
 function initGame() {
-    if (window.location.hash === '#music') {
-        isTargetActive = false;
-        isGameOver = true;
-        
-        gameScreen.classList.add('hidden');
-        musicScreen.classList.remove('hidden');
-        
-        navHeader.classList.remove('hidden');
-        navHeader.classList.add('visible');
-        
-        document.getElementById('tab-music').classList.add('active');
-        document.getElementById('tab-game').classList.remove('active');
-        
-        window.scrollTo(0, 0);
-    } else {
+    isTargetActive = true;
+    particles = [];
+    lastTime = 0;
+    initTarget();
+    updateGame();
 
-        isTargetActive = true;
-        particles = [];
-        initTarget();
-        updateGame();
-
-        skipBtn.classList.remove('visible');
-        clearTimeout(skipTimeout);
-        skipTimeout = setTimeout(() => {
-            skipBtn.classList.add('visible');
-        }, 15000); 
-    }
+    skipBtn.classList.remove('visible');
+    clearTimeout(skipTimeout);
+    skipTimeout = setTimeout(() => {
+        skipBtn.classList.add('visible');
+    }, 15000); 
 }
 
 skipBtn.addEventListener('click', transitionToMusic);
