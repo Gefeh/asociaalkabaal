@@ -24,10 +24,6 @@ content:
         type: string
         label: Release Date (YYYY-MM-DD)
         required: true
-      - name: duration
-        type: string
-        label: Song Duration (e.g., 5:44)
-        required: true
       - name: src
         type: file
         label: Streaming Audio File (MP3)

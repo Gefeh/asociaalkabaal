@@ -219,8 +219,7 @@ function handleSort(isSearching = false) {
         } else if (sortOption === 'date-asc') {
             return new Date(a.releaseDate) - new Date(b.releaseDate);
         } else if (sortOption === 'duration-desc') {
-            const getSecs = str => str.split(':').reduce((acc, time) => (60 * acc) + parseInt(time), 0);
-            return getSecs(b.duration) - getSecs(a.duration);
+            return b.durationSeconds - a.durationSeconds; 
         }
         return 0;
     });
@@ -387,11 +386,32 @@ fetch('tracks.json')
         return response.json();
     })
     .then(data => {
-        trackLibrary = data;
-        activePlaylist = [...trackLibrary];
-        
-        initGame();
-        renderTracklist();
+        const preloaderPromises = data.map(track => {
+            return new Promise(resolve => {
+                const tempAudio = new Audio();
+                tempAudio.src = track.src;
+                
+                tempAudio.addEventListener('loadedmetadata', () => {
+                    track.duration = formatTime(tempAudio.duration);
+                    track.durationSeconds = tempAudio.duration;
+                    resolve();
+                });
+                
+                tempAudio.addEventListener('error', () => {
+                    track.duration = "0:00";
+                    track.durationSeconds = 0;
+                    resolve();
+                });
+            });
+        });
+
+        Promise.all(preloaderPromises).then(() => {
+            trackLibrary = data;
+            activePlaylist = [...trackLibrary];
+            
+            initGame();
+            renderTracklist();
+        });
     })
     .catch(error => {
         console.error("Failed to load music database JSON:", error);
