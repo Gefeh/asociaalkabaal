@@ -386,6 +386,10 @@ fetch('tracks.json')
         return response.json();
     })
     .then(data => {
+        data.forEach((track, index) => {
+            track.id = index + 1;
+        });
+
         const preloaderPromises = data.map(track => {
             return new Promise(resolve => {
                 const tempAudio = new Audio();
@@ -393,7 +397,7 @@ fetch('tracks.json')
                 
                 tempAudio.addEventListener('loadedmetadata', () => {
                     track.duration = formatTime(tempAudio.duration);
-                    track.durationSeconds = tempAudio.duration;
+                    track.durationSeconds = tempAudio.duration;     
                     resolve();
                 });
                 

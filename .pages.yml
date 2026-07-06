@@ -10,10 +10,6 @@ content:
     format: json
     list: true
     fields:
-      - name: id
-        type: number
-        label: Track ID (Increase by 1 for each new song)
-        required: true
       - name: title
         type: string
         label: Song Title
