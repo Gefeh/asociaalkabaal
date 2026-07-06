@@ -73,7 +73,7 @@ function renderTracklist() {
         // Fixed: Check using global track ID instead of the unstable array index
         const isCurrent = (currentPlayingTrackId !== -1 && track.id === currentPlayingTrackId);
         const rowClass = isCurrent ? 'track-row active-playing' : 'track-row';
-        const playIndicator = isCurrent && isPlaying ? '⏸' : (index + 1);
+        const playIndicator = isCurrent && isPlaying ? '||' : (index + 1);
 
         const rowHTML = `
 <div class="${rowClass}" onclick="playTrack(${index})">
@@ -82,7 +82,7 @@ function renderTracklist() {
         <img class="row-cover" src="${track.cover}" alt="Cover">
         <div>
             <div class="row-title">${track.title}</div>
-            <div class="row-artist">${track.ep}</div>
+            <div class="row-ep">${track.ep}</div>
         </div>
     </div>
     <div class="row-date">${track.releaseDate}</div>
@@ -172,7 +172,7 @@ function updatePlayerUI() {
     document.getElementById('player-download-wav').setAttribute('download', `${track.title}.wav`);
 
     const playBtn = document.getElementById('master-play-btn');
-    playBtn.textContent = isPlaying ? '⏸' : '▶';
+    playBtn.textContent = isPlaying ? '||' : '▶';
 
     renderTracklist();
 }

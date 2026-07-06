@@ -412,11 +412,19 @@ audio {
     font-weight: 600;
     font-size: 0.95rem;
     margin-bottom: 2px;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.row-artist {
+.row-ep {
     font-size: 0.85rem;
     color: #888;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .row-date, .row-duration {
@@ -609,18 +617,24 @@ audio {
     text-overflow: ellipsis;
 }
 
-/* Hide track duration/date details on small screens to save space */
 @media (max-width: 768px) {
+    /* Set grid to 3 clean columns: Number (40px), Title/EP (takes rest), Downloads (125px) */
     .track-row {
-        grid-template-columns: 40px 2fr 1fr 80px;
+        grid-template-columns: 40px 1fr 125px;
     }
 
-    .row-date {
-        display: none;
+    /* Hide date and duration entirely on mobile to prevent overlapping */
+    .row-date, .row-duration {
+        display: none !important;
+    }
+
+    /* Add generous bottom padding so elements can be scrolled clear of the player bar */
+    #music-screen {
+        padding-bottom: 180px !important;
     }
 
     #master-player {
-        grid-template-columns: 1.2fr 1.8fr; /* Mobile adjustments */
+        grid-template-columns: 1.2fr 1.8fr;
         padding: 0 16px;
     }
 
