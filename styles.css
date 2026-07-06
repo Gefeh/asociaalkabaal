@@ -70,6 +70,7 @@ body {
     box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
     overflow: hidden;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    max-width: 100%; /* ADDED: Prevents container from pushing past mobile screens */
 }
 
     #canvas-container.borderless {
@@ -131,6 +132,8 @@ body {
 canvas {
     display: block;
     cursor: crosshair;
+    max-width: 100%; /* ADDED: Shrinks canvas dynamically on small screens */
+    height: auto; /* ADDED: Maintains aspect ratio */
 }
 
 .btn {
@@ -218,7 +221,7 @@ header {
     margin-bottom: 5px;
 }
 
-.track-artist {
+.track-ep {
     font-size: 0.9rem;
     color: #aaa;
 }
@@ -324,7 +327,7 @@ audio {
 
 #search-bar {
     flex: 1;
-    min-width: 250px;
+    min-width: 180px;
     background-color: var(--card-bg);
     border: 1px solid #333;
     color: var(--text-color);
@@ -381,12 +384,20 @@ audio {
         background-color: rgba(255, 255, 255, 0.05);
     }
 
+    /* High-contrast Red Highlight for the active song */
     .track-row.active-playing {
-        background-color: rgba(255, 77, 121, 0.1); /* 10% opacity neon red highlight */
+        background-color: rgba(255, 51, 102, 0.15) !important; /* Clearly visible 15% opacity red */
+        border-left: 4px solid var(--indie-red) !important; /* Adds a sleek red vertical bar on the left */
     }
 
+        /* Forces the title text of the playing song to turn solid, bright Indie Red */
         .track-row.active-playing .row-title {
-            color: var(--accent-color); /* Green title text */
+            color: var(--indie-red) !important;
+        }
+
+        /* Forces the play/pause icon of the active row to turn solid Indie Red */
+        .track-row.active-playing .row-num {
+            color: var(--indie-red) !important;
         }
 
 .row-num {
@@ -451,7 +462,6 @@ audio {
         color: #000;
     }
 
-/* --- MASTER PERSISTENT PLAYER BAR --- */
 #master-player {
     position: fixed;
     bottom: 0;
@@ -461,7 +471,7 @@ audio {
     background-color: #181818;
     border-top: 1px solid #282828;
     display: grid;
-    grid-template-columns: 1fr 1.6fr 1.4fr; /* Expanded side columns, narrowed middle */
+    grid-template-columns: 1fr 1.5fr 1fr; /* EQUAL SIDE COLUMNS FOR PERFECT DEAD-CENTERING */
     align-items: center;
     padding: 0 24px;
     z-index: 1001;
@@ -473,6 +483,12 @@ audio {
     align-items: center;
     gap: 14px;
     overflow: hidden;
+    min-width: 0; /* ADDED: Prevents flex container from expanding past screen width */
+}
+
+.player-track-info {
+    overflow: hidden;
+    min-width: 0; /* ADDED: Essential to trigger title text-truncation on mobile */
 }
 
 #player-cover {
@@ -482,10 +498,6 @@ audio {
     border-radius: 4px;
 }
 
-.player-track-info {
-    overflow: hidden;
-}
-
 #player-title {
     font-weight: 600;
     font-size: 0.9rem;
@@ -493,7 +505,7 @@ audio {
     margin-bottom: 3px;
 }
 
-#player-artist {
+#player-ep {
     font-size: 0.75rem;
     color: #b3b3b3;
 }
@@ -659,4 +671,24 @@ audio {
     .player-download-btn.secondary:hover {
         background-color: var(--indie-red);
         color: #fff;
+    }
+
+
+/* --- CUSTOM VECTOR PAUSE BAR ICON --- */
+.pause-icon-custom {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3px; /* Space between the two bars */
+    width: 12px;
+    height: 12px;
+    margin: 0 auto;
+}
+
+    .pause-icon-custom span {
+        display: block;
+        width: 3.5px; /* Bold width */
+        height: 10px; /* Shorter, comfortable height */
+        background-color: currentColor; /* Automatically inherits Red or Black based on container color */
+        border-radius: 1px; /* Subtle rounding on corners */
     }

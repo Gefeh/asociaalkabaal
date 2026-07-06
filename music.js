@@ -7,20 +7,20 @@ const navHeader = document.getElementById('nav-header');
 const trackLibrary = [
     {
         id: 1,
-        title: "Placeholder Track #1",
-        ep: "Placeholder EP",
-        releaseDate: "yyyy-mm-dd",
+        title: "Rebel Waves",
+        ep: "Corporate Noise EP",
+        releaseDate: "2026-05-12",
         duration: "6:12",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // Playback stream
-        mp3: "music/rebel-waves.mp3",                                        // Download MP3
-        wav: "music/rebel-waves.wav",                                        // Download WAV
+        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        mp3: "music/rebel-waves.mp3",
+        wav: "music/rebel-waves.wav",
         cover: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=150"
     },
     {
         id: 2,
-        title: "Placeholder Track #2",
-        ep: "Placeholder EP",
-        releaseDate: "yyyy-mm-dd",
+        title: "Corporate Noise",
+        ep: "Corporate Noise EP",
+        releaseDate: "2026-03-24",
         duration: "7:05",
         src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
         mp3: "music/corporate-noise.mp3",
@@ -29,9 +29,9 @@ const trackLibrary = [
     },
     {
         id: 3,
-        title: "Placeholder Track #3",
-        ep: "Placeholder EP",
-        releaseDate: "yyyy-mm-dd",
+        title: "Indie Resurgence",
+        ep: "Indie Resurgence EP",
+        releaseDate: "2026-06-01",
         duration: "5:44",
         src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
         mp3: "music/indie-resurgence.mp3",
@@ -43,7 +43,7 @@ const trackLibrary = [
 // Current active playback state
 let activePlaylist = [...trackLibrary];
 let currentTrackIndex = -1;
-let currentPlayingTrackId = -1;
+let currentPlayingTrackId = -1; // Safely tracks the song by ID, not list index
 let isPlaying = false;
 let skipTimeout;
 
@@ -60,6 +60,7 @@ function formatTime(seconds) {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
+// Render the tracklist rows dynamically
 function renderTracklist() {
     const container = document.getElementById('tracklist-container');
     container.innerHTML = '';
@@ -70,10 +71,12 @@ function renderTracklist() {
     }
 
     activePlaylist.forEach((track, index) => {
-        // Fixed: Check using global track ID instead of the unstable array index
+        // Check using global track ID instead of the unstable array index
         const isCurrent = (currentPlayingTrackId !== -1 && track.id === currentPlayingTrackId);
         const rowClass = isCurrent ? 'track-row active-playing' : 'track-row';
-        const playIndicator = isCurrent && isPlaying ? '||' : (index + 1);
+        const playIndicator = isCurrent && isPlaying
+    ? '<div class="pause-icon-custom"><span></span><span></span></div>'
+    : (index + 1);
 
         const rowHTML = `
 <div class="${rowClass}" onclick="playTrack(${index})">
@@ -103,20 +106,36 @@ function playTrack(index) {
     const playerBar = document.getElementById('master-player');
     playerBar.classList.remove('hidden');
 
+    const clickedTrack = activePlaylist[index];
+
+    // Check if the user is clicking the song that is already loaded
+    const isAlreadyActive = (currentPlayingTrackId !== -1 && clickedTrack.id === currentPlayingTrackId);
+
+    if (isAlreadyActive) {
+        // If already active, toggle play/pause instead of restarting the song
+        if (masterAudio.paused) {
+            masterAudio.play().catch(e => {});
+        } else {
+            masterAudio.pause();
+        }
+        return; // Exit the function immediately
+    }
+
+    // If it's a new song, load and play it standard
     currentTrackIndex = index;
     const track = activePlaylist[currentTrackIndex];
-    currentPlayingTrackId = track.id; // ADDED: Saves the ID globally
+    currentPlayingTrackId = track.id;
 
     masterAudio.src = track.src;
     masterAudio.load();
     masterAudio.play().then(() => {
-        isPlaying = true;
-        updatePlayerUI();
+        // Playback state updates are handled automatically by our native event listeners
     }).catch(e => {
         console.log("Playback interrupted.");
     });
 }
 
+// Toggle Play/Pause on the master player bar
 function togglePlay() {
     if (currentTrackIndex === -1) {
         playTrack(0);
@@ -172,7 +191,10 @@ function updatePlayerUI() {
     document.getElementById('player-download-wav').setAttribute('download', `${track.title}.wav`);
 
     const playBtn = document.getElementById('master-play-btn');
-    playBtn.textContent = isPlaying ? '||' : '▶';
+// Parses our custom pause bars inside the master play button, matching color to solid black automatically
+playBtn.innerHTML = isPlaying
+    ? '<div class="pause-icon-custom"><span></span><span></span></div>'
+    : '▶';
 
     renderTracklist();
 }
@@ -299,6 +321,8 @@ function switchTab(targetTab) {
 
         setTimeout(() => {
             document.body.style.backgroundColor = '';
+
+            // Access and reset game states defined globally in game.js
             canvasContainer.classList.remove('borderless');
 
             // Restore the game screen title and description text visibility
@@ -381,7 +405,7 @@ function initGame() {
         clearTimeout(skipTimeout);
         skipTimeout = setTimeout(() => {
             skipBtn.classList.add('visible');
-        }, 20000);
+        }, 15000);
     }
 }
 
@@ -404,12 +428,7 @@ masterAudio.addEventListener('ended', () => {
     nextTrack();
 });
 
-skipBtn.addEventListener('click', transitionToMusic);
-
-// Start game on boot
-initGame();
-renderTracklist();
-
+// Native audio state listeners (ensures UI is always in sync with playback)
 masterAudio.addEventListener('play', () => {
     isPlaying = true;
     updatePlayerUI();
@@ -419,3 +438,9 @@ masterAudio.addEventListener('pause', () => {
     isPlaying = false;
     updatePlayerUI();
 });
+
+skipBtn.addEventListener('click', transitionToMusic);
+
+// Start game on boot
+initGame();
+renderTracklist();

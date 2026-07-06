@@ -163,15 +163,17 @@ canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const clickX = touch.clientX - rect.left;
-    const clickY = touch.clientY - rect.top;
+    
+    const clickX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+    const clickY = (touch.clientY - rect.top) * (canvas.height / rect.height);
     processHit(clickX, clickY);
 });
 
 function handleHit(e) {
     const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
+    
+    const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
     processHit(clickX, clickY);
 }
 
