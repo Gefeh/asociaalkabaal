@@ -1,29 +1,11 @@
 [
   {
-    "title": "Rebel Waves",
-    "ep": "Corporate Noise EP",
+    "title": "Sjekkie",
+    "ep": "Single",
     "releaseDate": "2026-05-12",
     "src": "music/rebel-waves.mp3",
-    "mp3": "music/rebel-waves.mp3",
-    "wav": "music/rebel-waves.wav",
-    "cover": "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=150"
-  },
-  {
-    "title": "Corporate Noise",
-    "ep": "Corporate Noise EP",
-    "releaseDate": "2026-03-24",
-    "src": "music/corporate-noise.mp3",
-    "mp3": "music/corporate-noise.mp3",
-    "wav": "music/corporate-noise.wav",
-    "cover": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=150"
-  },
-  {
-    "title": "Indie Resurgence",
-    "ep": "Indie Resurgence EP",
-    "releaseDate": "2026-06-01",
-    "src": "music/indie-resurgence.mp3",
-    "mp3": "music/indie-resurgence.mp3",
-    "wav": "music/indie-resurgence.wav",
-    "cover": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=150"
+    "mp3": "assets/ytmp3free.cc_asociaal-kabaal-sjekkie-youtubemp3free.org.mp3",
+    "wav": "assets/ytmp3free.cc_asociaal-kabaal-sjekkie-youtubemp3free.org-1.mp3",
+    "cover": "assets/Screenshot 2026-07-06 192405.png"
   }
 ]
