@@ -4,10 +4,12 @@ media:
 
 content:
   - name: Tracks
-    type: list
     label: Your Music Library
+    type: file
     path: tracks.json
-    schema:
+    format: json
+    list: true
+    fields:
       - name: id
         type: number
         label: Track ID (Increase by 1 for each new song)
