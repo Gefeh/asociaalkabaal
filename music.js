@@ -3,42 +3,7 @@ const musicScreen = document.getElementById('music-screen');
 const skipBtn = document.getElementById('skip-btn');
 const navHeader = document.getElementById('nav-header');
 
-const trackLibrary = [
-    {
-        id: 1,
-        title: "Rebel Waves",
-        ep: "Corporate Noise EP",
-        releaseDate: "2026-05-12",
-        duration: "6:12",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        mp3: "music/rebel-waves.mp3",
-        wav: "music/rebel-waves.wav",
-        cover: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-        id: 2,
-        title: "Corporate Noise",
-        ep: "Corporate Noise EP",
-        releaseDate: "2026-03-24",
-        duration: "7:05",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-        mp3: "music/corporate-noise.mp3",
-        wav: "music/corporate-noise.wav",
-        cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-        id: 3,
-        title: "Indie Resurgence",
-        ep: "Indie Resurgence EP",
-        releaseDate: "2026-06-01",
-        duration: "5:44",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        mp3: "music/indie-resurgence.mp3",
-        wav: "music/indie-resurgence.wav",
-        cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=150"
-    }
-];
-
+let trackLibrary = [];
 let activePlaylist = [...trackLibrary];
 let currentTrackIndex = -1;
 let currentPlayingTrackId = -1;
@@ -414,5 +379,21 @@ masterAudio.addEventListener('pause', () => {
 
 skipBtn.addEventListener('click', transitionToMusic);
 
-initGame();
-renderTracklist();
+fetch('tracks.json')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error: status " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        trackLibrary = data;
+        activePlaylist = [...trackLibrary];
+        
+        initGame();
+        renderTracklist();
+    })
+    .catch(error => {
+        console.error("Failed to load music database JSON:", error);
+        initGame();
+    });
