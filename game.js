@@ -1,17 +1,12 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const gameScreen = document.getElementById('game-screen');
-const musicScreen = document.getElementById('music-screen');
-const skipBtn = document.getElementById('skip-btn');
 const canvasContainer = document.getElementById('canvas-container');
-const navHeader = document.getElementById('nav-header');
-
 
 const spotifyImg = new Image();
-spotifyImg.src = 'assets/custom-logo.png';
+spotifyImg.src = 'assets/custom-logo.png'; 
 
-const customHitSound = new Audio('assets/hit-sound.wav');
-const destroySound = new Audio('assets/destroy-sound.wav');
+const customHitSound = new Audio('assets/hit-sound.wav'); 
+const destroySound = new Audio('assets/destroy-sound.wav'); 
 
 let score = 0;
 const targetScore = 3;
@@ -20,10 +15,9 @@ let isGameOver = false;
 
 let isFrozen = false;
 let isFlashing = false;
-let isTargetActive = true;
-let particles = [];
-let skipTimeout;
-let lastTime = 0;
+let isTargetActive = true; 
+let particles = []; 
+let lastTime = 0; 
 
 const target = {
     x: 180,
@@ -38,22 +32,22 @@ class Particle {
         this.x = x;
         this.y = y;
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 5 + 2;
+        const speed = Math.random() * 5 + 2; 
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
-        this.size = Math.random() * 5 + 3;
+        this.size = Math.random() * 5 + 3; 
         this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
-
+        this.decay = Math.random() * 0.02 + 0.015; 
+        
         const colors = ['#ff3366', '#1DB954', '#ffffff'];
         this.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
     update(dt) { 
-                this.x += this.vx * dt;
-                this.y += this.vy * dt;
-                this.alpha -= this.decay * dt;
-            }
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.alpha -= this.decay * dt;
+    }
 
     draw() {
         ctx.save();
@@ -68,7 +62,7 @@ class Particle {
 
 function playPopSound() {
     try {
-        customHitSound.currentTime = 0;
+        customHitSound.currentTime = 0; 
         customHitSound.play().catch(e => {});
     } catch (e) {}
 }
@@ -84,7 +78,7 @@ function initTarget() {
     target.x = canvas.width / 2;
     target.y = canvas.height / 2;
     target.radius = 35;
-
+    
     const angle = Math.random() * Math.PI * 2;
     const speed = 7.5;
     target.vx = Math.cos(angle) * speed;
@@ -95,16 +89,16 @@ function updateGame(timestamp) {
     if (!timestamp) timestamp = performance.now();
     
     if (!lastTime) lastTime = timestamp;
-    let dt = (timestamp - lastTime) / 16.667;
-
+    let dt = (timestamp - lastTime) / 16.667; 
+    
     if (isNaN(dt) || dt > 4) {
         dt = 1;
     }
     lastTime = timestamp;
 
     if (!isFrozen && isTargetActive) {
-        target.x += target.vx * dt;
-        target.y += target.vy * dt;
+        target.x += target.vx * dt; 
+        target.y += target.vy * dt; 
 
         if (target.x - target.radius < 0) {
             target.x = target.radius;
@@ -152,7 +146,7 @@ function updateGame(timestamp) {
 
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.update(dt);
+        p.update(dt); 
         p.draw();
         if (p.alpha <= 0) {
             particles.splice(i, 1);
@@ -191,9 +185,9 @@ function processHit(clickX, clickY) {
 
         if (score >= targetScore) {
             isFrozen = true;
-            isTargetActive = false;
-
-            clearTimeout(skipTimeout);
+            isTargetActive = false; 
+            
+            if (typeof stopSkipTimer === "function") stopSkipTimer();
 
             try {
                 destroySound.currentTime = 0;
@@ -236,13 +230,25 @@ function endGame(won) {
 
     if (won) {
         isFrozen = true;
+
+        // 1. Instantly turn the entire webpage pitch black
         document.body.style.backgroundColor = '#000000';
+
+        // 2. Smoothly fade out the game title and description text above the canvas
+        const title = document.querySelector('#game-screen h1');
+        const desc = document.querySelector('#game-screen p');
+        if (title) title.classList.add('fade-out');
+        if (desc) desc.classList.add('fade-out');
+
+        // 3. Trigger the screen shake and remove the box border/glow
         canvasContainer.classList.add('shake');
         canvasContainer.classList.add('borderless');
 
         let flashCount = 0;
-
+        
+        // 4. Create a rapid flash loop (runs every 100 milliseconds)
         const flashInterval = setInterval(() => {
+            // Draw a black canvas background to blend seamlessly with the black page
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -252,118 +258,18 @@ function endGame(won) {
             ctx.font = '900 56px "Arial Black", Impact, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-
+            
             ctx.fillText("SPOTIFY", canvas.width / 2, canvas.height / 2 - 35);
             ctx.fillText("KILLED", canvas.width / 2, canvas.height / 2 + 35);
 
             flashCount++;
         }, 100);
 
+        // 5. Let the flash run for 1.2 seconds, then clean up and transition smoothly
         setTimeout(() => {
             clearInterval(flashInterval);
             canvasContainer.classList.remove('shake');
-            transitionToMusic();
-        }, 900);
+            if (typeof transitionToMusic === "function") transitionToMusic();
+        }, 1200);
     }
 }
-
-function transitionToMusic() {
-    clearTimeout(skipTimeout);
-    gameScreen.classList.add('fade-out');
-    
-    setTimeout(() => {
-        gameScreen.classList.add('hidden');
-        musicScreen.classList.add('fade-out');
-        musicScreen.classList.remove('hidden');
-        void musicScreen.offsetWidth; 
-        window.scrollTo(0, 0);
-        musicScreen.classList.remove('fade-out');
-
-        navHeader.classList.remove('hidden');
-        void navHeader.offsetWidth; 
-        navHeader.classList.add('visible');
-
-        document.getElementById('tab-music').classList.add('active');
-        document.getElementById('tab-game').classList.remove('active');
-    }, 600);
-}
-
-function switchTab(targetTab) {
-    const gameTab = document.getElementById('tab-game');
-    const musicTab = document.getElementById('tab-music');
-
-    if (targetTab === 'game') {
-        if (!gameScreen.classList.contains('hidden')) return;
-
-        if (window.location.hash === '#music') {
-            history.pushState("", document.title, window.location.pathname + window.location.search);
-        }
-
-        musicScreen.classList.add('fade-out');
-        
-        setTimeout(() => {
-            document.body.style.backgroundColor = '';
-            canvasContainer.classList.remove('borderless');
-
-            lastTime = 0;
-            score = 0;
-            isGameOver = false;
-            isFrozen = false;
-            isFlashing = false;
-            isTargetActive = true; 
-            particles = []; 
-            
-            musicScreen.classList.add('hidden');
-            gameScreen.classList.add('fade-out');
-            gameScreen.classList.remove('hidden');
-            void gameScreen.offsetWidth;
-            gameScreen.classList.remove('fade-out');
-
-            musicTab.classList.remove('active');
-            gameTab.classList.add('active');
-
-            skipBtn.style.display = 'none';
-
-            initTarget();
-            cancelAnimationFrame(animationFrameId);
-            updateGame();
-        }, 600);
-
-    } else if (targetTab === 'music') {
-        if (!musicScreen.classList.contains('hidden')) return;
-
-        window.location.hash = 'music';
-
-        gameScreen.classList.add('fade-out');
-        
-        setTimeout(() => {
-            gameScreen.classList.add('hidden');
-            musicScreen.classList.add('fade-out');
-            musicScreen.classList.remove('hidden');
-            void musicScreen.offsetWidth;
-            window.scrollTo(0, 0);
-            musicScreen.classList.remove('fade-out');
-
-            gameTab.classList.remove('active');
-            musicTab.classList.add('active');
-        }, 600);
-    }
-}
-
-function initGame() {
-    isTargetActive = true;
-    particles = [];
-    lastTime = 0;
-    initTarget();
-    updateGame();
-
-    skipBtn.classList.remove('visible');
-    clearTimeout(skipTimeout);
-    skipTimeout = setTimeout(() => {
-        skipBtn.classList.add('visible');
-    }, 15000); 
-}
-
-skipBtn.addEventListener('click', transitionToMusic);
-
-initGame();

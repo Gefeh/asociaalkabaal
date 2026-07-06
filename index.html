@@ -25,48 +25,68 @@
     </section>
 
     <!-- Music -->
+    <!-- SECTION 2: MUSIC DOWNLOAD & STREAMING (Spotify Redesign) -->
     <section id="music-screen" class="screen hidden">
         <header>
             <h2>Asociaal Kabaal</h2>
             <p>Stream or download exclusive tracks below.</p>
         </header>
 
-        <div class="track-list">
-            <div class="track-card">
-                <div class="track-info">
-                    <div class="track-title">Rebel Waves</div>
-                    <div class="track-artist">Your Client Name</div>
-                </div>
-                <div class="audio-player">
-                    <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-                </div>
-                <a href="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" download class="download-btn">Download MP3</a>
-            </div>
+        <!-- Search and Sort controls -->
+        <div class="search-sort-container">
+            <input type="text" id="search-bar" placeholder="Search by song or EP..." oninput="handleSearch()">
 
-            <div class="track-card">
-                <div class="track-info">
-                    <div class="track-title">Corporate Noise</div>
-                    <div class="track-artist">Your Client Name</div>
-                </div>
-                <div class="audio-player">
-                    <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
-                </div>
-                <a href="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" download class="download-btn">Download MP3</a>
+            <div class="sort-wrapper">
+                <label for="sort-select">Sort by:</label>
+                <select id="sort-select" onchange="handleSort()">
+                    <option value="date-desc">Release Date (Newest)</option>
+                    <option value="date-asc">Release Date (Oldest)</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="duration-desc">Duration (Longest)</option>
+                </select>
             </div>
+        </div>
 
-            <div class="track-card">
-                <div class="track-info">
-                    <div class="track-title">Indie Resurgence</div>
-                    <div class="track-artist">Your Client Name</div>
-                </div>
-                <div class="audio-player">
-                    <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
-                </div>
-                <a href="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" download class="download-btn">Download MP3</a>
-            </div>
+        <!-- The dynamically rendered tracklist -->
+        <div class="track-list" id="tracklist-container">
+            <!-- JavaScript will render the Spotify-like rows here -->
         </div>
     </section>
 
+    <!-- MASTER PLAYER BAR (Fixed at bottom of viewport, always visible after unlock) -->
+    <div id="master-player" class="hidden">
+        <div class="player-left">
+            <img id="player-cover" src="https://via.placeholder.com/56" alt="Album Art">
+            <div class="player-track-info">
+                <div id="player-title" class="truncate">Select a song</div>
+                <div id="player-artist" class="truncate"></div>
+            </div>
+        </div>
+
+        <div class="player-middle">
+            <div class="player-controls">
+                <button class="control-btn" onclick="prevTrack()">⏮</button>
+                <button class="control-btn play-btn" id="master-play-btn" onclick="togglePlay()">▶</button>
+                <button class="control-btn" onclick="nextTrack()">⏭</button>
+            </div>
+            <div class="progress-bar-container">
+                <span id="progress-current">0:00</span>
+                <input type="range" id="progress-slider" min="0" max="100" value="0" oninput="seekAudio()">
+                <span id="progress-total">0:00</span>
+            </div>
+        </div>
+
+        <div class="player-right">
+            <div class="volume-container">
+                <span id="volume-icon" onclick="toggleMute()" style="cursor: pointer;">🔊</span>
+                <input type="range" id="volume-slider" min="0" max="100" value="80" oninput="setVolume()">
+            </div>
+            <a id="player-download-mp3" href="#" download class="player-download-btn">MP3</a>
+            <a id="player-download-wav" href="#" download class="player-download-btn secondary">WAV</a>
+        </div>
+    </div>
+
     <script src="game.js"></script>
+    <script src="music.js"></script>
 </body>
 </html>

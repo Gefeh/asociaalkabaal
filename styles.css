@@ -1,7 +1,7 @@
 :root {
     --bg-color: #0b0b0b;
     --text-color: #ffffff;
-    --accent-color: #1DB954;
+    --accent-color: #ff4d79;
     --indie-red: #ff3366;
     --card-bg: #1a1a1a;
 }
@@ -35,10 +35,11 @@ body {
     opacity: 1;
 }
 
-    .screen.fade-out {
-        opacity: 0;
-        pointer-events: none;
-    }
+.fade-out {
+    opacity: 0 !important;
+    transition: opacity 0.5s ease-in-out !important;
+    pointer-events: none !important;
+}
 
 .hidden {
     display: none !important;
@@ -260,6 +261,7 @@ audio {
     }
 }
 
+/* --- FIXED STICKY NAVIGATION BAR (Pill Style) --- */
 #nav-header {
     position: fixed;
     top: 0;
@@ -267,10 +269,11 @@ audio {
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 12px;
-    background-color: #0b0b0b;
-    border-bottom: 2px solid var(--card-bg);
-    padding: 20px 20px 0 20px;
+    gap: 15px;
+    background-color: rgba(11, 11, 11, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #222;
+    padding: 15px 20px;
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
@@ -280,32 +283,366 @@ audio {
         opacity: 1;
     }
 
+/* Usability-first Spotify Pill Tabs */
 .tab-btn {
     background-color: transparent;
-    border: 2px solid transparent;
-    border-bottom: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    color: #888;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-transform: none;
+    border: none;
+    border-radius: 500px; /* Smooth modern pill shape */
+    color: #b3b3b3;
+    font-size: 0.9rem;
+    font-weight: 700;
     letter-spacing: 0.5px;
     cursor: pointer;
-    padding: 12px 24px;
-    margin-bottom: -2px;
-    transition: all 0.25s ease;
+    padding: 8px 20px;
+    transition: all 0.2s ease;
 }
 
     .tab-btn:hover {
         color: #fff;
-        background-color: rgba(255, 255, 255, 0.03);
+        background-color: rgba(255, 255, 255, 0.05);
     }
 
+    /* Active pill highlight (No alignment or subpixel border issues) */
     .tab-btn.active {
         color: #fff;
-        background-color: var(--card-bg);
-        border-color: var(--card-bg);
-        border-top: 3px solid var(--indie-red);
-        padding-top: 11px;
+        background-color: var(--indie-red); /* Solid indie-red accent pill */
+    }
+
+/* --- SPOTIFY MUSIC OVERHAUL --- */
+
+/* Search and Sort controls */
+.search-sort-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+#search-bar {
+    flex: 1;
+    min-width: 250px;
+    background-color: var(--card-bg);
+    border: 1px solid #333;
+    color: var(--text-color);
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border-radius: 500px; /* Rounded pill search input */
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+    #search-bar:focus {
+        border-color: var(--accent-color); /* Spotlights green on focus */
+    }
+
+.sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .sort-wrapper label {
+        font-size: 0.85rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+#sort-select {
+    background-color: var(--card-bg);
+    border: 1px solid #333;
+    color: var(--text-color);
+    padding: 8px 12px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Spotify List Layout */
+.track-row {
+    width: 100%;
+    max-width: 800px;
+    display: grid;
+    grid-template-columns: 50px 3fr 2fr 1fr 160px;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 10px;
+}
+
+    .track-row:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .track-row.active-playing {
+        background-color: rgba(255, 77, 121, 0.1); /* 10% opacity neon red highlight */
+    }
+
+        .track-row.active-playing .row-title {
+            color: var(--accent-color); /* Green title text */
+        }
+
+.row-num {
+    color: #888;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.row-info-col {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.row-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.row-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.row-artist {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.row-date, .row-duration {
+    font-size: 0.85rem;
+    color: #b3b3b3;
+}
+
+.row-download-btn {
+    background-color: transparent;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 500px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+    .row-download-btn:hover {
+        border-color: #fff;
+        background-color: #fff;
+        color: #000;
+    }
+
+/* --- MASTER PERSISTENT PLAYER BAR --- */
+#master-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background-color: #181818;
+    border-top: 1px solid #282828;
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1.4fr; /* Expanded side columns, narrowed middle */
+    align-items: center;
+    padding: 0 24px;
+    z-index: 1001;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+}
+
+.player-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    overflow: hidden;
+}
+
+#player-cover {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.player-track-info {
+    overflow: hidden;
+}
+
+#player-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 3px;
+}
+
+#player-artist {
+    font-size: 0.75rem;
+    color: #b3b3b3;
+}
+
+.player-middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+}
+
+    .control-btn:hover {
+        color: #fff;
+    }
+
+.play-btn {
+    background-color: #fff;
+    color: #000 !important;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem !important;
+}
+
+    .play-btn:hover {
+        transform: scale(1.06);
+    }
+
+.progress-bar-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .progress-bar-container span {
+        font-size: 0.75rem;
+        color: #b3b3b3;
+        min-width: 30px;
+    }
+
+#progress-slider, #volume-slider {
+    flex: 1;
+    height: 4px;
+    background: #535353;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    accent-color: #fff; /* White playback slider handles */
+}
+
+/* ADDED: Safely forces the browser range input to shrink inside the 95px container */
+#volume-slider {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+    #progress-slider:hover, #volume-slider:hover {
+        accent-color: var(--accent-color); /* Greens up slider when hovered */
+    }
+
+.player-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 95px !important; /* Locks the physical container size */
+    flex-shrink: 0 !important; /* Prevents the browser from squeezing the layout */
+    margin-right: 40px !important; /* Forces a spacious 40px buffer gap */
+}
+
+/* Locks the download button sizes so they never shrink or wrap */
+.player-download-btn {
+    background-color: var(--indie-red);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 500px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.2s;
+    flex-shrink: 0 !important; /* ADDED: Prevents text-wrapping or shrinking */
+}
+
+    .player-download-btn:hover {
+        background-color: #ff5588;
+    }
+
+/* Helper Class */
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hide track duration/date details on small screens to save space */
+@media (max-width: 768px) {
+    .track-row {
+        grid-template-columns: 40px 2fr 1fr 80px;
+    }
+
+    .row-date {
+        display: none;
+    }
+
+    #master-player {
+        grid-template-columns: 1.2fr 1.8fr; /* Mobile adjustments */
+        padding: 0 16px;
+    }
+
+    .player-right {
+        display: none; /* Hide volume controls on mobile */
+    }
+}
+
+.row-downloads {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Secondary master player download pill outline */
+.player-download-btn.secondary {
+    background-color: transparent;
+    border: 1px solid var(--indie-red);
+    color: var(--indie-red);
+}
+
+    .player-download-btn.secondary:hover {
+        background-color: var(--indie-red);
+        color: #fff;
     }
