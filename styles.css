@@ -70,7 +70,7 @@ body {
     box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
     overflow: hidden;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    max-width: 100%; /* ADDED: Prevents container from pushing past mobile screens */
+    max-width: 100%;
 }
 
     #canvas-container.borderless {
@@ -132,8 +132,8 @@ body {
 canvas {
     display: block;
     cursor: crosshair;
-    max-width: 100%; /* ADDED: Shrinks canvas dynamically on small screens */
-    height: auto; /* ADDED: Maintains aspect ratio */
+    max-width: 100%;
+    height: auto;
 }
 
 .btn {
@@ -264,7 +264,6 @@ audio {
     }
 }
 
-/* --- FIXED STICKY NAVIGATION BAR (Pill Style) --- */
 #nav-header {
     position: fixed;
     top: 0;
@@ -286,11 +285,10 @@ audio {
         opacity: 1;
     }
 
-/* Usability-first Spotify Pill Tabs */
 .tab-btn {
     background-color: transparent;
     border: none;
-    border-radius: 500px; /* Smooth modern pill shape */
+    border-radius: 500px;
     color: #b3b3b3;
     font-size: 0.9rem;
     font-weight: 700;
@@ -305,15 +303,11 @@ audio {
         background-color: rgba(255, 255, 255, 0.05);
     }
 
-    /* Active pill highlight (No alignment or subpixel border issues) */
     .tab-btn.active {
         color: #fff;
-        background-color: var(--indie-red); /* Solid indie-red accent pill */
+        background-color: var(--indie-red);
     }
 
-/* --- SPOTIFY MUSIC OVERHAUL --- */
-
-/* Search and Sort controls */
 .search-sort-container {
     width: 100%;
     max-width: 800px;
@@ -333,13 +327,13 @@ audio {
     color: var(--text-color);
     padding: 12px 16px;
     font-size: 0.95rem;
-    border-radius: 500px; /* Rounded pill search input */
+    border-radius: 500px;
     outline: none;
     transition: border-color 0.2s;
 }
 
     #search-bar:focus {
-        border-color: var(--accent-color); /* Spotlights green on focus */
+        border-color: var(--accent-color);
     }
 
 .sort-wrapper {
@@ -365,7 +359,6 @@ audio {
     cursor: pointer;
 }
 
-/* Spotify List Layout */
 .track-row {
     width: 100%;
     max-width: 800px;
@@ -384,18 +377,15 @@ audio {
         background-color: rgba(255, 255, 255, 0.05);
     }
 
-    /* High-contrast Red Highlight for the active song */
     .track-row.active-playing {
-        background-color: rgba(255, 51, 102, 0.15) !important; /* Clearly visible 15% opacity red */
-        border-left: 4px solid var(--indie-red) !important; /* Adds a sleek red vertical bar on the left */
+        background-color: rgba(255, 51, 102, 0.15) !important;
+        border-left: 4px solid var(--indie-red) !important;
     }
 
-        /* Forces the title text of the playing song to turn solid, bright Indie Red */
         .track-row.active-playing .row-title {
             color: var(--indie-red) !important;
         }
 
-        /* Forces the play/pause icon of the active row to turn solid Indie Red */
         .track-row.active-playing .row-num {
             color: var(--indie-red) !important;
         }
@@ -471,7 +461,7 @@ audio {
     background-color: #181818;
     border-top: 1px solid #282828;
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr; /* EQUAL SIDE COLUMNS FOR PERFECT DEAD-CENTERING */
+    grid-template-columns: 1fr 1.5fr 1fr;
     align-items: center;
     padding: 0 24px;
     z-index: 1001;
@@ -483,12 +473,12 @@ audio {
     align-items: center;
     gap: 14px;
     overflow: hidden;
-    min-width: 0; /* ADDED: Prevents flex container from expanding past screen width */
+    min-width: 0;
 }
 
 .player-track-info {
     overflow: hidden;
-    min-width: 0; /* ADDED: Essential to trigger title text-truncation on mobile */
+    min-width: 0;
 }
 
 #player-cover {
@@ -575,17 +565,16 @@ audio {
     border-radius: 2px;
     outline: none;
     cursor: pointer;
-    accent-color: #fff; /* White playback slider handles */
+    accent-color: #fff;
 }
 
-/* ADDED: Safely forces the browser range input to shrink inside the 95px container */
 #volume-slider {
     width: 100% !important;
     min-width: 0 !important;
 }
 
     #progress-slider:hover, #volume-slider:hover {
-        accent-color: var(--accent-color); /* Greens up slider when hovered */
+        accent-color: var(--accent-color);
     }
 
 .player-right {
@@ -599,12 +588,11 @@ audio {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 95px !important; /* Locks the physical container size */
-    flex-shrink: 0 !important; /* Prevents the browser from squeezing the layout */
-    margin-right: 40px !important; /* Forces a spacious 40px buffer gap */
+    width: 95px !important;
+    flex-shrink: 0 !important;
+    margin-right: 40px !important;
 }
 
-/* Locks the download button sizes so they never shrink or wrap */
 .player-download-btn {
     background-color: var(--indie-red);
     color: #fff;
@@ -615,14 +603,13 @@ audio {
     font-weight: bold;
     text-decoration: none;
     transition: background 0.2s;
-    flex-shrink: 0 !important; /* ADDED: Prevents text-wrapping or shrinking */
+    flex-shrink: 0 !important;
 }
 
     .player-download-btn:hover {
         background-color: #ff5588;
     }
 
-/* Helper Class */
 .truncate {
     white-space: nowrap;
     overflow: hidden;
@@ -630,17 +617,14 @@ audio {
 }
 
 @media (max-width: 768px) {
-    /* Set grid to 3 clean columns: Number (40px), Title/EP (takes rest), Downloads (125px) */
     .track-row {
         grid-template-columns: 40px 1fr 125px;
     }
 
-    /* Hide date and duration entirely on mobile to prevent overlapping */
     .row-date, .row-duration {
         display: none !important;
     }
 
-    /* Add generous bottom padding so elements can be scrolled clear of the player bar */
     #music-screen {
         padding-bottom: 180px !important;
     }
@@ -651,7 +635,7 @@ audio {
     }
 
     .player-right {
-        display: none; /* Hide volume controls on mobile */
+        display: none;
     }
 }
 
@@ -661,7 +645,6 @@ audio {
     justify-content: flex-end;
 }
 
-/* Secondary master player download pill outline */
 .player-download-btn.secondary {
     background-color: transparent;
     border: 1px solid var(--indie-red);
@@ -673,13 +656,11 @@ audio {
         color: #fff;
     }
 
-
-/* --- CUSTOM VECTOR PAUSE BAR ICON --- */
 .pause-icon-custom {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: 3px; /* Space between the two bars */
+    gap: 3px;
     width: 12px;
     height: 12px;
     margin: 0 auto;
@@ -687,8 +668,8 @@ audio {
 
     .pause-icon-custom span {
         display: block;
-        width: 3.5px; /* Bold width */
-        height: 10px; /* Shorter, comfortable height */
-        background-color: currentColor; /* Automatically inherits Red or Black based on container color */
-        border-radius: 1px; /* Subtle rounding on corners */
+        width: 3.5px;
+        height: 10px;
+        background-color: currentColor;
+        border-radius: 1px;
     }

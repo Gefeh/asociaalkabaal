@@ -3,7 +3,6 @@ const musicScreen = document.getElementById('music-screen');
 const skipBtn = document.getElementById('skip-btn');
 const navHeader = document.getElementById('nav-header');
 
-// 1. MUSIC DATABASE CONFIGURATION (Add or edit songs easily here!)
 const trackLibrary = [
     {
         id: 1,
@@ -40,19 +39,14 @@ const trackLibrary = [
     }
 ];
 
-// Current active playback state
 let activePlaylist = [...trackLibrary];
 let currentTrackIndex = -1;
-let currentPlayingTrackId = -1; // Safely tracks the song by ID, not list index
+let currentPlayingTrackId = -1;
 let isPlaying = false;
 let skipTimeout;
 
-// Global HTML5 Audio Element for Master Playback
 const masterAudio = new Audio();
 
-// --- SPOTIFY MASTER PLAYER LOGIC ---
-
-// Format seconds into digital clock time (e.g. 372 seconds -> 6:12)
 function formatTime(seconds) {
     if (isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
@@ -60,7 +54,6 @@ function formatTime(seconds) {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// Render the tracklist rows dynamically
 function renderTracklist() {
     const container = document.getElementById('tracklist-container');
     container.innerHTML = '';
@@ -71,7 +64,6 @@ function renderTracklist() {
     }
 
     activePlaylist.forEach((track, index) => {
-        // Check using global track ID instead of the unstable array index
         const isCurrent = (currentPlayingTrackId !== -1 && track.id === currentPlayingTrackId);
         const rowClass = isCurrent ? 'track-row active-playing' : 'track-row';
         const playIndicator = isCurrent && isPlaying
@@ -108,20 +100,17 @@ function playTrack(index) {
 
     const clickedTrack = activePlaylist[index];
 
-    // Check if the user is clicking the song that is already loaded
     const isAlreadyActive = (currentPlayingTrackId !== -1 && clickedTrack.id === currentPlayingTrackId);
 
     if (isAlreadyActive) {
-        // If already active, toggle play/pause instead of restarting the song
         if (masterAudio.paused) {
             masterAudio.play().catch(e => {});
         } else {
             masterAudio.pause();
         }
-        return; // Exit the function immediately
+        return;
     }
 
-    // If it's a new song, load and play it standard
     currentTrackIndex = index;
     const track = activePlaylist[currentTrackIndex];
     currentPlayingTrackId = track.id;
@@ -129,13 +118,12 @@ function playTrack(index) {
     masterAudio.src = track.src;
     masterAudio.load();
     masterAudio.play().then(() => {
-        // Playback state updates are handled automatically by our native event listeners
+        
     }).catch(e => {
         console.log("Playback interrupted.");
     });
 }
 
-// Toggle Play/Pause on the master player bar
 function togglePlay() {
     if (currentTrackIndex === -1) {
         playTrack(0);
@@ -154,7 +142,6 @@ function togglePlay() {
 function nextTrack() {
     if (activePlaylist.length === 0) return;
 
-    // Find where the currently playing song sits in the current active view
     let activeIndex = activePlaylist.findIndex(t => t.id === currentPlayingTrackId);
     let nextIndex = activeIndex + 1;
 
@@ -176,7 +163,6 @@ function prevTrack() {
     playTrack(prevIndex);
 }
 
-// Keep the Master Player UI elements matched with current track state
 function updatePlayerUI() {
     if (currentTrackIndex === -1) return;
     const track = activePlaylist[currentTrackIndex];
@@ -191,7 +177,6 @@ function updatePlayerUI() {
     document.getElementById('player-download-wav').setAttribute('download', `${track.title}.wav`);
 
     const playBtn = document.getElementById('master-play-btn');
-// Parses our custom pause bars inside the master play button, matching color to solid black automatically
 playBtn.innerHTML = isPlaying
     ? '<div class="pause-icon-custom"><span></span><span></span></div>'
     : '▶';
@@ -205,9 +190,8 @@ function seekAudio() {
     masterAudio.currentTime = targetTime;
 }
 
-let lastVolume = 0.8; // Store last unmuted volume globally
+let lastVolume = 0.8;
 
-// Handle volume slider movements
 function setVolume() {
     const slider = document.getElementById('volume-slider');
     const volumeIcon = document.getElementById('volume-icon');
@@ -221,11 +205,10 @@ function setVolume() {
     } else {
         masterAudio.muted = false;
         volumeIcon.textContent = '🔊';
-        lastVolume = val; // Remember the last non-zero volume level
+        lastVolume = val;
     }
 }
 
-// Toggle Mute/Unmute when the speaker icon is clicked
 function toggleMute() {
     const volumeIcon = document.getElementById('volume-icon');
     const slider = document.getElementById('volume-slider');
@@ -236,7 +219,6 @@ function toggleMute() {
         slider.value = lastVolume * 100;
         volumeIcon.textContent = '🔊';
     } else {
-        // Save current volume before muting (as long as it's not already zero)
         lastVolume = masterAudio.volume > 0 ? masterAudio.volume : 0.8;
         masterAudio.muted = true;
         masterAudio.volume = 0;
@@ -244,8 +226,6 @@ function toggleMute() {
         volumeIcon.textContent = '🔇';
     }
 }
-
-// --- SEARCH AND SORTING ALGORITHMS ---
 
 function handleSearch() {
     const query = document.getElementById('search-bar').value.toLowerCase().trim();
@@ -282,8 +262,6 @@ function handleSort(isSearching = false) {
 
     renderTracklist();
 }
-
-// --- NAVIGATION & TABS (Unified State Router) ---
 
 function transitionToMusic() {
     clearTimeout(skipTimeout);
@@ -322,10 +300,8 @@ function switchTab(targetTab) {
         setTimeout(() => {
             document.body.style.backgroundColor = '';
 
-            // Access and reset game states defined globally in game.js
             canvasContainer.classList.remove('borderless');
 
-            // Restore the game screen title and description text visibility
             const title = document.querySelector('#game-screen h1');
             const desc = document.querySelector('#game-screen p');
             if (title) title.classList.remove('fade-out');
@@ -409,8 +385,6 @@ function initGame() {
     }
 }
 
-// --- MASTER AUDIO EVENT LISTENERS ---
-
 masterAudio.addEventListener('timeupdate', () => {
     const slider = document.getElementById('progress-slider');
     const currentText = document.getElementById('progress-current');
@@ -428,7 +402,6 @@ masterAudio.addEventListener('ended', () => {
     nextTrack();
 });
 
-// Native audio state listeners (ensures UI is always in sync with playback)
 masterAudio.addEventListener('play', () => {
     isPlaying = true;
     updatePlayerUI();
@@ -441,6 +414,5 @@ masterAudio.addEventListener('pause', () => {
 
 skipBtn.addEventListener('click', transitionToMusic);
 
-// Start game on boot
 initGame();
 renderTracklist();

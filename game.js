@@ -233,24 +233,19 @@ function endGame(won) {
     if (won) {
         isFrozen = true;
 
-        // 1. Instantly turn the entire webpage pitch black
         document.body.style.backgroundColor = '#000000';
 
-        // 2. Smoothly fade out the game title and description text above the canvas
         const title = document.querySelector('#game-screen h1');
         const desc = document.querySelector('#game-screen p');
         if (title) title.classList.add('fade-out');
         if (desc) desc.classList.add('fade-out');
 
-        // 3. Trigger the screen shake and remove the box border/glow
         canvasContainer.classList.add('shake');
         canvasContainer.classList.add('borderless');
 
         let flashCount = 0;
         
-        // 4. Create a rapid flash loop (runs every 100 milliseconds)
         const flashInterval = setInterval(() => {
-            // Draw a black canvas background to blend seamlessly with the black page
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -267,7 +262,6 @@ function endGame(won) {
             flashCount++;
         }, 100);
 
-        // 5. Let the flash run for 1.2 seconds, then clean up and transition smoothly
         setTimeout(() => {
             clearInterval(flashInterval);
             canvasContainer.classList.remove('shake');
