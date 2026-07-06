@@ -1,0 +1,46 @@
+media:
+  input: assets
+  output: assets
+
+content:
+  - name: Tracks
+    type: list
+    label: Your Music Library
+    path: tracks.json
+    schema:
+      - name: id
+        type: number
+        label: Track ID (Increase by 1 for each new song)
+        required: true
+      - name: title
+        type: string
+        label: Song Title
+        required: true
+      - name: ep
+        type: string
+        label: EP / Album Name
+        required: true
+      - name: releaseDate
+        type: string
+        label: Release Date (YYYY-MM-DD)
+        required: true
+      - name: duration
+        type: string
+        label: Song Duration (e.g., 5:44)
+        required: true
+      - name: src
+        type: file
+        label: Streaming Audio File (MP3)
+        required: true
+      - name: mp3
+        type: file
+        label: Download MP3 File (Compressed)
+        required: true
+      - name: wav
+        type: file
+        label: Download WAV File (High-Quality Raw)
+        required: true
+      - name: cover
+        type: file
+        label: EP / Album Cover Art
+        required: true
