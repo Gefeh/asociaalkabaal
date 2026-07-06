@@ -17,24 +17,20 @@ content:
       - name: ep
         type: string
         label: EP / Album Name
-        required: true
+        required: false
       - name: releaseDate
         type: string
         label: Release Date (YYYY-MM-DD)
         required: true
-      - name: src
-        type: file
-        label: Streaming Audio File (MP3)
-        required: true
       - name: mp3
         type: file
-        label: Download MP3 File (Compressed)
+        label: MP3 File
         required: true
       - name: wav
         type: file
-        label: Download WAV File (High-Quality Raw)
+        label: WAV File
         required: true
       - name: cover
         type: file
-        label: EP / Album Cover Art
+        label: Cover Art / Icon
         required: true

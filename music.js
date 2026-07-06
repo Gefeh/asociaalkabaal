@@ -80,7 +80,7 @@ function playTrack(index) {
     const track = activePlaylist[currentTrackIndex];
     currentPlayingTrackId = track.id;
 
-    masterAudio.src = track.src;
+    masterAudio.src = track.mp3;
     masterAudio.load();
     masterAudio.play().then(() => {
         
@@ -393,7 +393,7 @@ fetch('tracks.json')
         const preloaderPromises = data.map(track => {
             return new Promise(resolve => {
                 const tempAudio = new Audio();
-                tempAudio.src = track.src;
+                tempAudio.src = track.mp3;
                 
                 tempAudio.addEventListener('loadedmetadata', () => {
                     track.duration = formatTime(tempAudio.duration);
