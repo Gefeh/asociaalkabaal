@@ -42,7 +42,7 @@ function renderTracklist() {
         <img class="row-cover" src="${track.cover}" alt="Cover">
         <div>
             <div class="row-title">${track.title}</div>
-            <div class="row-ep">${track.ep}</div>
+            <div class="row-ep">${track.ep || ''}</div>
         </div>
     </div>
     <div class="row-date">${track.releaseDate}</div>
@@ -134,7 +134,7 @@ function updatePlayerUI() {
 
     document.getElementById('player-cover').src = track.cover;
     document.getElementById('player-title').textContent = track.title;
-    document.getElementById('player-artist').textContent = track.ep;
+    document.getElementById('player-artist').textContent = track.ep || '';
     document.getElementById('player-download-mp3').href = track.mp3;
     document.getElementById('player-download-mp3').setAttribute('download', `${track.title}.mp3`);
 
@@ -196,9 +196,9 @@ function handleSearch() {
     const query = document.getElementById('search-bar').value.toLowerCase().trim();
 
     activePlaylist = trackLibrary.filter(track => {
-        return track.title.toLowerCase().includes(query) ||
-               track.ep.toLowerCase().includes(query);
-    });
+    return track.title.toLowerCase().includes(query) || 
+           (track.ep && track.ep.toLowerCase().includes(query));
+});
 
     handleSort(true);
 }
