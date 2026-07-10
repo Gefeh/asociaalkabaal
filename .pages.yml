@@ -33,4 +33,3 @@ content:
       - name: cover
         type: file
         label: Cover Art / Icon
-        required: true
