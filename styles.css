@@ -617,6 +617,10 @@ audio {
 }
 
 @media (max-width: 768px) {
+    #music-logo {
+        max-width: 240px !important;
+    }
+
     .track-row {
         grid-template-columns: 40px 1fr 125px;
     }
