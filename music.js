@@ -83,7 +83,7 @@ function playTrack(index) {
     masterAudio.src = track.mp3;
     masterAudio.load();
     masterAudio.play().then(() => {
-        
+
     }).catch(e => {
         console.log("Playback interrupted.");
     });
@@ -196,7 +196,7 @@ function handleSearch() {
     const query = document.getElementById('search-bar').value.toLowerCase().trim();
 
     activePlaylist = trackLibrary.filter(track => {
-    return track.title.toLowerCase().includes(query) || 
+    return track.title.toLowerCase().includes(query) ||
            (track.ep && track.ep.toLowerCase().includes(query));
 });
 
@@ -219,7 +219,7 @@ function handleSort(isSearching = false) {
         } else if (sortOption === 'date-asc') {
             return new Date(a.releaseDate) - new Date(b.releaseDate);
         } else if (sortOption === 'duration-desc') {
-            return b.durationSeconds - a.durationSeconds; 
+            return b.durationSeconds - a.durationSeconds;
         }
         return 0;
     });
@@ -378,7 +378,7 @@ masterAudio.addEventListener('pause', () => {
 
 skipBtn.addEventListener('click', transitionToMusic);
 
-fetch('tracks.json')
+fetch('tracks.json?t=' + Date.now())
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error: status " + response.status);
@@ -394,13 +394,13 @@ fetch('tracks.json')
             return new Promise(resolve => {
                 const tempAudio = new Audio();
                 tempAudio.src = track.mp3;
-                
+
                 tempAudio.addEventListener('loadedmetadata', () => {
                     track.duration = formatTime(tempAudio.duration);
-                    track.durationSeconds = tempAudio.duration;     
+                    track.durationSeconds = tempAudio.duration;
                     resolve();
                 });
-                
+
                 tempAudio.addEventListener('error', () => {
                     track.duration = "0:00";
                     track.durationSeconds = 0;
@@ -412,7 +412,7 @@ fetch('tracks.json')
         Promise.all(preloaderPromises).then(() => {
             trackLibrary = data;
             activePlaylist = [...trackLibrary];
-            
+
             initGame();
             renderTracklist();
         });
