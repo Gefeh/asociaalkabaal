@@ -217,7 +217,7 @@ function processHit(clickX, clickY) {
             }, 200);
 
             const currentSpeed = Math.hypot(target.vx, target.vy);
-            const newSpeed = currentSpeed * 1.6;
+            const newSpeed = currentSpeed * 1.45;
 
             const randomAngle = Math.random() * Math.PI * 2;
             target.vx = Math.cos(randomAngle) * newSpeed;
