@@ -565,17 +565,13 @@ audio {
     border-radius: 2px;
     outline: none;
     cursor: pointer;
-    accent-color: #fff;
+    accent-color: var(--accent-color);
 }
 
 #volume-slider {
     width: 100% !important;
     min-width: 0 !important;
 }
-
-    #progress-slider:hover, #volume-slider:hover {
-        accent-color: var(--accent-color);
-    }
 
 .player-right {
     display: flex;
