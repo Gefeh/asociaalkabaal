@@ -22,3 +22,10 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 .vs/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
