@@ -8,7 +8,10 @@ content:
     type: file
     path: tracks.json
     format: json
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title}"
     fields:
       - name: title
         type: string
