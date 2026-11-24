@@ -30,8 +30,9 @@ content:
         label: MP3 File (stream + download)
         required: true
       - name: wav
-        type: file
-        label: WAV File (download)
+        type: string
+        label: WAV Download Link
+        description: Upload the WAV to the Cloudflare R2 bucket, then paste its link here
         required: true
       - name: cover
         type: file

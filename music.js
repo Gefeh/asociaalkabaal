@@ -428,3 +428,43 @@ fetch('tracks.json?t=' + Date.now())
     .catch(error => {
         console.error("Failed to load music database JSON:", error);
     });
+
+// Browsers ignore the download attribute on links to another domain (like the
+// R2 bucket holding the WAVs) and open the file in a player instead. For those
+// links, fetch the file and save it from a local blob URL so it downloads with
+// the right name. If that fails, fall back to opening the link normally.
+document.addEventListener('click', async (event) => {
+    const link = event.target.closest('a[download]');
+    if (!link) return;
+
+    const url = new URL(link.href, window.location.href);
+    if (url.origin === window.location.origin || !url.protocol.startsWith('http')) return;
+
+    event.preventDefault();
+    if (link.dataset.downloading) return;
+
+    const originalText = link.textContent;
+    link.dataset.downloading = 'true';
+    link.textContent = '...';
+
+    try {
+        const response = await fetch(url.href);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.download = link.getAttribute('download') || url.pathname.split('/').pop();
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        tempLink.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch (error) {
+        console.error('Download failed, opening the file instead:', error);
+        window.open(url.href, '_blank', 'noopener');
+    } finally {
+        link.textContent = originalText;
+        delete link.dataset.downloading;
+    }
+}, true);

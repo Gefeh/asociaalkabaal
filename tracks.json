@@ -3,7 +3,7 @@
     "title": "Test",
     "releaseDate": "yyyy-mm-dd",
     "mp3": "assets/ytmp3free.cc_asociaal-kabaal-sjekkie-youtubemp3free.org.mp3",
-    "wav": "assets/ytmp3free.cc_asociaal-kabaal-sjekkie-youtubemp3free.org-1.mp3",
+    "wav": "https://pub-9d4330ff7a664065a175bfc20123cbe4.r2.dev/sample-speech-10m.wav",
     "cover": "assets/Screenshot 2026-07-06 192405.png"
   },
   {
