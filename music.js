@@ -5,12 +5,16 @@ const navHeader = document.getElementById('nav-header');
 
 let trackLibrary = [];
 let activePlaylist = [...trackLibrary];
-let currentTrackIndex = -1;
 let currentPlayingTrackId = -1;
 let isPlaying = false;
 let skipTimeout;
 
 const masterAudio = new Audio();
+const DEFAULT_COVER = 'assets/akabaal.jpg';
+
+function getTrackById(id) {
+    return trackLibrary.find(t => t.id === id);
+}
 
 function formatTime(seconds) {
     if (isNaN(seconds)) return "0:00";
@@ -36,17 +40,17 @@ function renderTracklist() {
     : (index + 1);
 
         const rowHTML = `
-<div class="${rowClass}" onclick="playTrack(${index})">
+<div class="${rowClass}" onclick="playTrackById(${track.id})">
     <div class="row-num">${playIndicator}</div>
     <div class="row-info-col">
-        <img class="row-cover" src="${track.cover}" alt="Cover">
+        <img class="row-cover" src="${track.cover || DEFAULT_COVER}" alt="Cover">
         <div>
             <div class="row-title">${track.title}</div>
             <div class="row-ep">${track.ep || ''}</div>
         </div>
     </div>
     <div class="row-date">${track.releaseDate}</div>
-    <div class="row-duration">${track.duration}</div>
+    <div class="row-duration">${track.duration || '–:––'}</div>
     <div class="row-downloads">
         <a href="${track.mp3}" download="${track.title}.mp3" class="row-download-btn" onclick="event.stopPropagation();">MP3</a>
         <a href="${track.wav}" download="${track.title}.wav" class="row-download-btn" onclick="event.stopPropagation();">WAV</a>
@@ -76,8 +80,7 @@ function playTrack(index) {
         return;
     }
 
-    currentTrackIndex = index;
-    const track = activePlaylist[currentTrackIndex];
+    const track = clickedTrack;
     currentPlayingTrackId = track.id;
 
     masterAudio.src = track.mp3;
@@ -89,8 +92,12 @@ function playTrack(index) {
     });
 }
 
+function playTrackById(id) {
+    playTrack(activePlaylist.findIndex(t => t.id === id));
+}
+
 function togglePlay() {
-    if (currentTrackIndex === -1) {
+    if (currentPlayingTrackId === -1) {
         playTrack(0);
         return;
     }
@@ -129,10 +136,10 @@ function prevTrack() {
 }
 
 function updatePlayerUI() {
-    if (currentTrackIndex === -1) return;
-    const track = activePlaylist[currentTrackIndex];
+    const track = getTrackById(currentPlayingTrackId);
+    if (!track) return;
 
-    document.getElementById('player-cover').src = track.cover;
+    document.getElementById('player-cover').src = track.cover || DEFAULT_COVER;
     document.getElementById('player-title').textContent = track.title;
     document.getElementById('player-artist').textContent = track.ep || '';
     document.getElementById('player-download-mp3').href = track.mp3;
@@ -219,7 +226,7 @@ function handleSort(isSearching = false) {
         } else if (sortOption === 'date-asc') {
             return new Date(a.releaseDate) - new Date(b.releaseDate);
         } else if (sortOption === 'duration-desc') {
-            return b.durationSeconds - a.durationSeconds;
+            return (b.durationSeconds || 0) - (a.durationSeconds || 0);
         }
         return 0;
     });
@@ -287,7 +294,7 @@ function switchTab(targetTab) {
             musicTab.classList.remove('active');
             gameTab.classList.add('active');
 
-            skipBtn.style.display = 'none';
+            startSkipTimer();
 
             lastTime = 0;
             initTarget();
@@ -313,6 +320,14 @@ function switchTab(targetTab) {
             musicTab.classList.add('active');
         }, 600);
     }
+}
+
+function startSkipTimer() {
+    skipBtn.classList.remove('visible');
+    clearTimeout(skipTimeout);
+    skipTimeout = setTimeout(() => {
+        skipBtn.classList.add('visible');
+    }, 15000);
 }
 
 function stopSkipTimer() {
@@ -341,11 +356,7 @@ function initGame() {
         initTarget();
         updateGame();
 
-        skipBtn.classList.remove('visible');
-        clearTimeout(skipTimeout);
-        skipTimeout = setTimeout(() => {
-            skipBtn.classList.add('visible');
-        }, 15000);
+        startSkipTimer();
     }
 }
 
@@ -378,6 +389,8 @@ masterAudio.addEventListener('pause', () => {
 
 skipBtn.addEventListener('click', transitionToMusic);
 
+initGame();
+
 fetch('tracks.json?t=' + Date.now())
     .then(response => {
         if (!response.ok) {
@@ -390,34 +403,28 @@ fetch('tracks.json?t=' + Date.now())
             track.id = index + 1;
         });
 
-        const preloaderPromises = data.map(track => {
-            return new Promise(resolve => {
-                const tempAudio = new Audio();
-                tempAudio.src = track.mp3;
+        trackLibrary = data;
+        handleSearch();
 
-                tempAudio.addEventListener('loadedmetadata', () => {
-                    track.duration = formatTime(tempAudio.duration);
-                    track.durationSeconds = tempAudio.duration;
-                    resolve();
-                });
+        data.forEach(track => {
+            const tempAudio = new Audio();
+            tempAudio.preload = 'metadata';
 
-                tempAudio.addEventListener('error', () => {
-                    track.duration = "0:00";
-                    track.durationSeconds = 0;
-                    resolve();
-                });
+            tempAudio.addEventListener('loadedmetadata', () => {
+                track.duration = formatTime(tempAudio.duration);
+                track.durationSeconds = tempAudio.duration;
+                handleSearch();
             });
-        });
 
-        Promise.all(preloaderPromises).then(() => {
-            trackLibrary = data;
-            activePlaylist = [...trackLibrary];
+            tempAudio.addEventListener('error', () => {
+                track.duration = "0:00";
+                track.durationSeconds = 0;
+                handleSearch();
+            });
 
-            initGame();
-            renderTracklist();
+            tempAudio.src = track.mp3;
         });
     })
     .catch(error => {
         console.error("Failed to load music database JSON:", error);
-        initGame();
     });

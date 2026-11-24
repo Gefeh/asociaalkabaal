@@ -27,12 +27,12 @@ content:
         required: true
       - name: mp3
         type: file
-        label: MP3 File
+        label: MP3 File (stream + download)
         required: true
       - name: wav
         type: file
-        label: WAV File
+        label: WAV File (download)
         required: true
       - name: cover
         type: file
-        label: Cover Art / Icon
+        label: Cover Art
